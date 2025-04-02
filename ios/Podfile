@@ -1,17 +1,14 @@
-# Définition de la plateforme iOS minimale requise
-platform :ios, '14.0'
+platform :ios, '12.0'
 
-# CocoaPods analytics envoie des statistiques réseau de manière synchrone, ce qui peut affecter la latence de la compilation Flutter.
+# CocoaPods analytics sends network stats synchronously affecting flutter build latency.
 ENV['COCOAPODS_DISABLE_STATS'] = 'true'
 
-# Définition du projet Xcode
 project 'Runner', {
   'Debug' => :debug,
   'Profile' => :release,
   'Release' => :release,
 }
 
-# Fonction pour obtenir le chemin du SDK Flutter
 def flutter_root
   generated_xcode_build_settings_path = File.expand_path(File.join('..', 'Flutter', 'Generated.xcconfig'), __FILE__)
   unless File.exist?(generated_xcode_build_settings_path)
@@ -25,25 +22,37 @@ def flutter_root
   raise "FLUTTER_ROOT not found in #{generated_xcode_build_settings_path}. Try deleting Generated.xcconfig, then run flutter pub get"
 end
 
-# Inclusion du script de gestion des pods Flutter
 require File.expand_path(File.join('packages', 'flutter_tools', 'bin', 'podhelper'), flutter_root)
 
 flutter_ios_podfile_setup
 
-# Configuration de la cible principale
 target 'Runner' do
-  use_frameworks!
-
+  # Commentez cette ligne pour éviter les problèmes avec les dépendances statiques
+  # use_frameworks!
+  
+  use_modular_headers!
+  
   flutter_install_all_ios_pods File.dirname(File.realpath(__FILE__))
-
-  target 'RunnerTests' do
-    inherit! :search_paths
-  end
 end
 
-# Configuration post-installation des dépendances
 post_install do |installer|
   installer.pods_project.targets.each do |target|
     flutter_additional_ios_build_settings(target)
+    
+    # Suppression complète des flags problématiques pour BoringSSL-GRPC
+    target.build_configurations.each do |config|
+      config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '12.0'
+      
+      # Correction plus robuste pour BoringSSL-GRPC
+      if target.name == 'BoringSSL-GRPC' || target.name == 'gRPC-Core' || target.name == 'gRPC-C++'
+        # Supprimer complètement les flags -G problématiques au lieu de les remplacer
+        if config.build_settings['OTHER_CFLAGS']
+          config.build_settings['OTHER_CFLAGS'] = config.build_settings['OTHER_CFLAGS'].split(' ').reject { |flag| flag.start_with?('-G') }.join(' ')
+        end
+        if config.build_settings['OTHER_CXXFLAGS']
+          config.build_settings['OTHER_CXXFLAGS'] = config.build_settings['OTHER_CXXFLAGS'].split(' ').reject { |flag| flag.start_with?('-G') }.join(' ')
+        end
+      end
+    end
   end
 end

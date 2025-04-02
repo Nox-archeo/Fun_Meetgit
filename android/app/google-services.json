@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "224405523729",
+    "project_id": "fun-meets",
+    "storage_bucket": "fun-meets.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:224405523729:android:1a4114ba50dc36b9c850b0",
+        "android_client_info": {
+          "package_name": "com.funmeet.fun_meet"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDkKzBPN8kyXnuZTamX8wQDtoztRJSk3v8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
